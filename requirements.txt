@@ -1,0 +1,4 @@
+# Garmin Connect API wrapper — https://github.com/cyberjunky/python-garminconnect
+# Handles the mobile SSO login flow, MFA and OAuth token refresh.
+# Requires Python 3.12 or newer.
+garminconnect>=0.3.11
