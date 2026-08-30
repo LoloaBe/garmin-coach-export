@@ -1,5 +1,10 @@
 .venv/
-garmin_data/
+
+# Ignore the bulky raw export, but keep the condensed dashboard data in git --
+# it's ~100 KB and every commit of it is a dated snapshot of your training history.
+garmin_data/*
+!garmin_data/dashboard_data.json
+
 __pycache__/
 *.pyc
 .env

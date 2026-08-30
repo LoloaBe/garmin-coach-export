@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.lucacriscuolo.garmincoach</string>
+
+    <!-- Runs refresh_and_publish.sh once a day at 06:15 local time. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>6</integer>
+        <key>Minute</key>
+        <integer>15</integer>
+    </dict>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-lc</string>
+        <string>cd ~/Documents/GitHub/garmin-coach-export &amp;&amp; bash refresh_and_publish.sh</string>
+    </array>
+
+    <!-- If the Mac was asleep at 06:15, launchd runs it as soon as the Mac wakes. -->
+    <key>StandardOutPath</key>
+    <string>/tmp/garmincoach-launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/garmincoach-launchd.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
