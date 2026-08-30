@@ -116,22 +116,33 @@
   }
   .masthead h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; }
   .masthead .sub { color: var(--ink-2); font-size: 13.5px; margin-top: 4px; }
-  .refresh-box { text-align: right; }
-  .refresh-box .stamp { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .refresh-box { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+  @media (min-width: 760px) { .refresh-box { align-items: flex-end; } }
+  .refresh-box .stamp { font-size: 12px; color: var(--muted); }
   .refresh-box .stamp b { color: var(--ink-2); font-weight: 600; }
-  .copy-btn {
-    font-family: inherit; font-size: 12.5px; font-weight: 600;
-    background: var(--surface); color: var(--ink);
-    border: 1px solid var(--border); border-radius: 7px;
-    padding: 8px 13px; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 7px;
+  .run-label { font-size: 12px; color: var(--ink-2); font-weight: 600; }
+  .cmd-box {
+    font-family: inherit; text-align: left;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px; cursor: pointer;
     box-shadow: var(--shadow);
     transition: border-color 0.15s ease;
+    display: flex; flex-direction: column; gap: 3px; min-width: 260px;
   }
-  .copy-btn:hover { border-color: var(--accent); }
-  .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .copy-btn svg { width: 13px; height: 13px; flex: none; }
-  .copy-hint { font-size: 11px; color: var(--muted); margin-top: 6px; max-width: 220px; }
+  .cmd-box:hover { border-color: var(--accent); }
+  .cmd-box:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .cmd-box .cwd {
+    font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--muted);
+  }
+  .cmd-box .cmd-row { display: flex; align-items: center; gap: 8px; }
+  .cmd-box .cmd-row .sigil { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--accent); }
+  .cmd-box .cmd-row .cmd-text {
+    font-family: "IBM Plex Mono", monospace; font-size: 12.5px; font-weight: 500; color: var(--ink);
+  }
+  .cmd-box .cmd-row .ic { margin-left: auto; width: 12px; height: 12px; flex: none; color: var(--muted); }
+  .cmd-box:hover .cmd-row .ic { color: var(--accent); }
+  .copy-hint { font-size: 11px; color: var(--muted); max-width: 280px; }
+  @media (min-width: 760px) { .copy-hint { text-align: right; } }
 
   /* ---------- sections ---------- */
   section { margin-bottom: 36px; }
@@ -324,11 +335,16 @@
     </div>
     <div class="refresh-box">
       <div class="stamp" id="stamp">—</div>
-      <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy refresh prompt">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M3 11V3.5C3 2.67 3.67 2 4.5 2H10"/></svg>
-        <span id="copy-btn-text">Copy refresh prompt</span>
+      <div class="run-label">Run this to update this console</div>
+      <button class="cmd-box" id="copy-btn" type="button" aria-label="Copy the refresh command to the clipboard">
+        <span class="cwd">~/Documents/GitHub/garmin-coach-export</span>
+        <span class="cmd-row">
+          <span class="sigil" aria-hidden="true">$</span>
+          <span class="cmd-text" id="copy-btn-text">bash refresh_and_publish.sh</span>
+          <svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5"/><path d="M3 11V3.5C3 2.67 3.67 2 4.5 2H10"/></svg>
+        </span>
       </button>
-      <div class="copy-hint">Artifacts can't run local scripts. Paste this into Claude to pull fresh Garmin data and republish this page.</div>
+      <div class="copy-hint">Pulls fresh Garmin data, rebuilds this page and pushes it. Ask Claude to republish afterwards to update this Artifact copy.</div>
     </div>
   </div>
 
@@ -459,7 +475,7 @@
   </section>
 
   <footer>
-    <p><b style="color:var(--ink-2)">Data:</b> exported from Garmin Connect via <span class="prompt-inline">garmin_export.py</span> on Luca's Mac. This page is a static snapshot — to refresh, tell Claude <span class="prompt-inline">update my triathlon dashboard</span> and it will re-run the export, recompute this dashboard and republish this same link.</p>
+    <p><b style="color:var(--ink-2)">Data:</b> exported from Garmin Connect on Luca's Mac. Running <span class="prompt-inline">bash refresh_and_publish.sh</span> pulls new data, merges it into the accumulating history, rebuilds this page and pushes it. The training plan above is maintained by Claude — tell it what changed and it updates here.</p>
     <p id="footer-problems"></p>
   </footer>
 
@@ -545,17 +561,17 @@
     `Recovery & readiness — ${days.length}-day trend`;
   document.querySelectorAll(".win-days").forEach(el => { el.textContent = days.length; });
 
-  const REFRESH_PROMPT = "Update my triathlon dashboard with the latest Garmin data.";
+  const REFRESH_CMD = "bash refresh_and_publish.sh";
   const copyBtn = document.getElementById("copy-btn");
   const copyBtnText = document.getElementById("copy-btn-text");
   copyBtn.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(REFRESH_PROMPT);
+      await navigator.clipboard.writeText(REFRESH_CMD);
       copyBtnText.textContent = "Copied ✓";
     } catch (e) {
-      copyBtnText.textContent = "Copy failed — select text";
+      copyBtnText.textContent = "Select and copy manually";
     }
-    setTimeout(() => { copyBtnText.textContent = "Copy refresh prompt"; }, 2200);
+    setTimeout(() => { copyBtnText.textContent = REFRESH_CMD; }, 2000);
   });
 
   // ================= TOOLTIP HELPER =================
