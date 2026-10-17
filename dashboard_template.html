@@ -1146,79 +1146,51 @@
       return `<span class="discipline-chip"><span class="sw" style="background:${color}"></span>${label}</span>`;
     }
 
-    const racePred = athlete.race_predictions_s || {};
-    function paceMinKm(sec) { const m = Math.floor(sec / 60), s = Math.round(sec % 60); return `${m}:${String(s).padStart(2, "0")}/km`; }
-    const tenKPaceSec = racePred["10k"] ? racePred["10k"] / 10 : null;
-    const thresholdPace = tenKPaceSec ? `≈ ${paceMinKm(tenKPaceSec - 8)}–${paceMinKm(tenKPaceSec + 2)}/km` : "RPE 7–8";
-
-    const olyPaceSec = racePred["10k"] ? (racePred["10k"] / 10) * 0.97 : null; // Olympic-distance run off the bike ~ slightly slower than open 10K pace
-    const olyPace = olyPaceSec ? `≈ ${paceMinKm(olyPaceSec - 5)}–${paceMinKm(olyPaceSec + 8)}/km` : "controlled, negative-split feel";
+    // ---- Coach-maintained content ----------------------------------------
+    // Everything from here to the race calendar is written by the coach, not
+    // derived from Garmin data. It only changes when the template is edited.
+    // PLAN_REVISED / PLAN_VALID_UNTIL make staleness visible instead of silent.
+    const PLAN_REVISED = "2026-09-24";
+    const PLAN_VALID_UNTIL = "2026-10-04";
 
     const BLOCKS = [
       {
-        title: "Bridge", dates: "Sat 29 – Sun 30 Aug",
-        note: "Saturday's group ride stays on the Tarmac — the Speedmax hasn't landed yet, and 30km/h in a group isn't the place to debut a new bike anyway. Sunday is built around Saturday evening's wine tasting: later start, autoregulated, no pace target.",
+        title: "Post-Erkner bike block — finish of week 2", dates: "Fri 25 – Sun 27 Sep",
+        note: "Readiness is low (16 on Wed, 28 today) and HRV dropped to 71 ms, below your ~79 baseline floor, after Wednesday's ride that Garmin scored as VO2max work at 189 bpm — above your lab HRmax of 177. Most likely wrist-HR artefact, but not yet proven. So the weekend is gated: the long ride goes ahead only if Friday/Saturday morning HRV is back near baseline and you feel normal; otherwise swap it for 60–75 min easy and push the long ride a week.",
         rows: [
-          { day: "Sat 29 Aug (AM)", key: "bike", label: "Bike", duration: "~80 min", session: "Group ride, 40km @ ~30km/h — ride within the group, no need to push", intensity: `Likely Z2, touching Z3 on pulls/hills`, purpose: "Aerobic bike volume (road bike — aero work resumes later this week)", priority: "KEY" },
-          { day: "Sat 29 Aug (PM)", key: "strength", label: "Wine tasting", duration: "—", session: "Alternate a glass of water with each pour, eat properly beforehand, one big glass of water before bed", intensity: "—", purpose: "Blunt next-day dehydration & sleep disruption", priority: "OPTIONAL" },
-          { day: "Sun 30 Aug", key: "run", label: "Run", duration: "60–70 min", session: "Long easy run, fully conversational — start later morning (rehydrate & sleep off Saturday first). Check HRV/RHR and how you actually feel before committing to the full distance; cut to ~40min easy or an easy walk if it's not there.", intensity: `Z2 · ${zoneSpan(runZ,2,2)} — no pace target`, purpose: "Maintain aerobic base, weather's good — autoregulated around Saturday's recovery cost", priority: "KEY" }
+          { day: "Fri 25 Sep (AM)", key: "swim", label: "Swim", duration: "40–45 min", session: "Prinzenbad — aerobic, technique focus; 6×100 steady with 20 s rest in the middle", intensity: "Easy–steady", purpose: "Swim frequency without load", priority: "SUPPORTING" },
+          { day: "Fri 25 Sep (PM)", key: "run", label: "Run", duration: "40 min", session: "Easy run, flat. If readiness is still LOW/POOR, cut to 25–30 min or walk.", intensity: "Conversational · HR ≤ ~135 (lab IAS 149)", purpose: "Aerobic maintenance while recovery settles", priority: "OPTIONAL" },
+          { day: "Sat 26 Sep", key: "bike", label: "Bike", duration: "2h–2h30", session: "Long Speedmax ride, mostly on the extensions. 3 × 10 min cadence blocks at 80–85 rpm; otherwise let cadence sit ≥ 75. Eat 60–80 g carbs/h from the start. Wear a chest strap if you have one — it settles the HR question.", intensity: "140–165 W · RPE 3–4", purpose: "Aero-position durability + cadence + fuelling practice", priority: "KEY" },
+          { day: "Sun 27 Sep", key: "run", label: "Run", duration: "50–60 min", session: "Easy long-ish run. Drop it entirely if Saturday left you flat.", intensity: "Conversational · HR ≤ ~135", purpose: "Run durability, low impact", priority: "SUPPORTING" }
         ]
       },
       {
-        title: "Sharpen into Wannsee — Erkner is the protected race", dates: "Mon 31 Aug – Sat 5 Sep",
-        note: "You chose to protect Erkner (12 Sep) and race Wannsee controlled, as an opener rather than an all-out effort. You also want the Speedmax raced ASAP rather than eased in gradually — a reasonable trade at this priority level. It's expected mid-week; once it lands, bike sessions move to it. Two rides before race day isn't a real break-in, so Thursday and Saturday exist specifically to check fit, gearing, hydration access and handling before it's raced.",
+        title: "Week 3 — test and extend", dates: "Mon 28 Sep – Sun 4 Oct",
+        note: "The FTP test is the point of this week: until there is a measured number, bike sessions are prescribed off an inferred ~224 W. Do it on the trainer (repeatable, no traffic) and only when HRV is back inside baseline — otherwise slide it to Saturday and make Saturday the long ride on Sunday. Sat 3 Oct is a public holiday, which gives room for the longest ride of the block.",
         rows: [
-          { day: "Mon 31 Aug", key: "bike", label: "Bike", duration: "40 min", session: "Tarmac easy spin + 4×1min at race effort, full recovery between (Speedmax not here yet)", intensity: `Z1–Z2 · ${zoneSpan(bikeZ,1,2)}`, purpose: "Leg speed touch ahead of Wannsee", priority: "SUPPORTING" },
-          { day: "Tue 1 Sep", key: "swim", label: "Swim", duration: "35 min", session: "Prinzenbad — easy technique + 6×50m fast/easy", intensity: "Aerobic + short pickups", purpose: "Stay sharp without fatigue", priority: "SUPPORTING" },
-          { day: "Wed 2 Sep", key: "run", label: "Run", duration: "35 min", session: "Easy run + 4×2min at sprint-tri race pace, 90s jog recovery", intensity: `${zoneSpan(runZ,3,4)} · race effort`, purpose: "Neuromuscular sharpness for Wannsee", priority: "KEY" },
-          { day: "Thu 3 Sep", key: "bike", label: "Bike", duration: "45 min", session: "First ride on the Speedmax — easy spin, dial in fit, get a feel for the aero position, brakes and shifters. No intensity, this is purely about the bike.", intensity: "Z1, easy", purpose: "Break in the race bike before Sunday", priority: "KEY" },
-          { day: "Fri 4 Sep (AM)", key: "swim", label: "Swim", duration: "20 min", session: "Prinzenbad — easy technique only", intensity: "Z1", purpose: "Stay loose, no fatigue cost", priority: "OPTIONAL" },
-          { day: "Fri 4 Sep (PM)", key: "strength", label: "Rest", duration: "—", session: "Skip the usual Friday run — 2 days out from Wannsee, full rest wins here. Mobility only if you want to move.", intensity: "—", purpose: "Arrive fresh for Sunday", priority: "KEY" },
-          { day: "Sat 5 Sep", key: "brick", label: "Shakeout", duration: "25 min", session: "10min Speedmax + 10min run, easy with 3–4 short pickups; check gearing, hydration/nutrition access in aero, and cornering/braking feel — last chance to catch anything before tomorrow", intensity: "Easy + short pickups", purpose: "Final race-bike check, pre-race activation", priority: "KEY" }
-        ]
-      },
-      {
-        title: "RACE — Berlin WoMan, Wannsee (sprint)", dates: "Sun 6 Sep", isRaceBlock: true,
-        rows: [
-          { day: "Sun 6 Sep", key: "brick", label: "Race", duration: "~1h15–1h30", session: "Berlin WoMan, Wannsee — race controlled/strong on the Speedmax, not all-out. First race on the new bike: a deliberately low-stakes place to learn it under real conditions before Erkner and Barcelona.", intensity: "Race effort, controlled", purpose: "Sharpening opener + first Speedmax race data — Erkner is still the priority", priority: "C", isRace: true }
-        ]
-      },
-      {
-        title: "Bridge into Erkner", dates: "Mon 7 – Fri 11 Sep",
-        note: "Real recovery first, then two short race-pace touches on the Speedmax so you arrive at Erkner sharp — and with a second data point on the bike before it's raced over a full Olympic-distance bike leg.",
-        rows: [
-          { day: "Mon 7 Sep", key: "strength", label: "Rest", duration: "—", session: "Full rest or an easy walk — let Wannsee settle before the next push", intensity: "—", purpose: "Recovery", priority: "OPTIONAL" },
-          { day: "Tue 8 Sep", key: "swim", label: "Swim", duration: "25 min", session: "Prinzenbad — very easy, technique only", intensity: "Z1", purpose: "Recovery", priority: "OPTIONAL" },
-          { day: "Wed 9 Sep", key: "bike", label: "Bike", duration: "40 min", session: "Speedmax easy spin + 3×2min at Olympic race effort — second real ride on the race bike", intensity: `Z1–Z2 · ${zoneSpan(bikeZ,1,2)} + short efforts`, purpose: "Build comfort on the Speedmax before it's raced over 40km", priority: "KEY" },
-          { day: "Thu 10 Sep", key: "run", label: "Run", duration: "30 min", session: "Easy run + 3×1min at Olympic race pace", intensity: `Z2 + short opener`, purpose: "Prime run legs for Erkner", priority: "KEY" },
-          { day: "Fri 11 Sep (AM)", key: "swim", label: "Swim", duration: "15–20 min", session: "Prinzenbad — short and easy, openers only", intensity: "Z1", purpose: "Stay loose without cost", priority: "OPTIONAL" },
-          { day: "Fri 11 Sep (PM)", key: "strength", label: "Rest", duration: "—", session: "Skip the usual Friday run — race is tomorrow. Pack bags, check the Speedmax (now genuinely your race bike), plan nutrition/logistics", intensity: "—", purpose: "Arrive fresh & organized", priority: "KEY" }
-        ]
-      },
-      {
-        title: "RACE — IRONMAN 5150 Erkner (Olympic)", dates: "Sat 12 Sep", isRaceBlock: true,
-        rows: [
-          { day: "Sat 12 Sep", key: "brick", label: "Race", duration: "~2h20–2h45", session: "IRONMAN 5150 Erkner — 1.5k swim / 40k bike / 10k run, on the Speedmax. This is the protected race: full effort, proper pacing, and your first real Olympic-distance bike leg in the aero position under fatigue.", intensity: `Run target ${olyPace}`, purpose: "Season's second key race + first aero-durability data point", priority: "B", isRace: true }
-        ]
-      },
-      {
-        title: "Recovery week", dates: "Sun 13 – Sat 19 Sep",
-        note: "Two hard efforts in a week is real fatigue — this week is deliberately unstructured. Move it to a normal build week only once soreness, sleep and readiness look back to baseline, not by the calendar. Worth some honest reflection on the Speedmax too: how did fit, aero-position fatigue and the run off the bike feel across two races? That's the input for the Barcelona bike call.",
-        rows: [
-          { day: "Sun 13 Sep", key: "strength", label: "Rest", duration: "—", session: "Full rest — legs, not willpower, decide the rest of the week", intensity: "—", purpose: "Absorb race fatigue", priority: "KEY" },
-          { day: "Mon–Wed", key: "swim", label: "Easy movement", duration: "20–30 min/day", session: "Easy swim and/or walk, whatever feels good — no structure, no pace targets", intensity: "Z1", purpose: "Active recovery", priority: "OPTIONAL" },
-          { day: "Thu–Fri", key: "run", label: "Reintroduce", duration: "20–30 min", session: "Easy run and easy spin if legs feel normal again — first day back sets the tone for the Barcelona build", intensity: "Z1–Z2", purpose: "Gentle return to structure", priority: "OPTIONAL" },
-          { day: "Sat 19 Sep", key: "strength", label: "Strength", duration: "30 min", session: "Reintroduce strength work, light load", intensity: "RPE 4–5", purpose: "Restart the strength thread before the build", priority: "SUPPORTING" }
+          { day: "Mon 28 Sep", key: "strength", label: "Strength", duration: "35–40 min", session: "Restart the strength thread: split squat or step-up, RDL, calf raises (straight + bent knee), side plank, Copenhagen plank. 2–3 sets, stop 2–3 reps short of failure.", intensity: "RPE 6–7", purpose: "Tendon & force capacity, masters muscle maintenance", priority: "SUPPORTING" },
+          { day: "Tue 29 Sep", key: "swim", label: "Swim", duration: "45 min", session: "Prinzenbad — warm-up 400, then 8 × 100 at strong-steady (~1:40–1:42/100) with 15 s rest, 200 easy", intensity: "Threshold-ish", purpose: "Re-establish swim threshold feel", priority: "SUPPORTING" },
+          { day: "Wed 30 Sep", key: "bike", label: "Bike", duration: "60 min", session: "FTP test on the Speedmax, Wahoo. 20 min warm-up incl. 3 × 1 min high cadence + 5 min at ~220 W, 5 min easy, then 20 min all-out, even-paced (start at ~215 W and build). FTP ≈ 0.95 × 20-min average. Note cadence and position — ride it on the extensions.", intensity: "Maximal 20 min", purpose: "Measured FTP → all bike prescription switches to power", priority: "KEY" },
+          { day: "Thu 1 Oct", key: "swim", label: "Swim", duration: "90 min", session: "Triathlon Team Berlin trial, Stadtbad Tiergarten 20:00. (08:00 same day: Ingolstadt registration opens.)", intensity: "As coached", purpose: "Coached swim + group; test whether it fits the week", priority: "OPTIONAL" },
+          { day: "Fri 2 Oct (AM)", key: "swim", label: "Swim", duration: "30–40 min", session: "Prinzenbad easy — skip if Thursday's group swim happened", intensity: "Easy", purpose: "Frequency", priority: "OPTIONAL" },
+          { day: "Fri 2 Oct (PM)", key: "run", label: "Run", duration: "50 min", session: "Easy run + 6 × 20 s strides on flat ground, full recovery", intensity: "Conversational + strides", purpose: "Aerobic base + economy", priority: "SUPPORTING" },
+          { day: "Sat 3 Oct", key: "bike", label: "Bike", duration: "2h30", session: "Long Speedmax ride. With a tested FTP: 2 × 20 min at 78–82 % FTP inside the ride, rest at 65–70 %. Cadence ≥ 78 on the efforts. Fuel 70–80 g/h. Optional 15 min easy run straight after.", intensity: "65–82 % FTP", purpose: "Aero durability at race-relevant power", priority: "KEY" },
+          { day: "Sun 4 Oct", key: "run", label: "Run", duration: "60–70 min", session: "Long easy run", intensity: "Conversational · HR ≤ ~135", purpose: "Run durability", priority: "SUPPORTING" }
         ]
       }
     ];
 
     const planContent = document.getElementById("plan-content");
-    let html = `
+    const planStale = daysUntil(PLAN_VALID_UNTIL) < 0;
+    let html = "";
+    if (planStale) {
+      html += `<div class="warn-banner"><svg class="ic" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3.2M8 11.6v.1"/></svg><div class="tx"><b>This plan has run out.</b> It covered sessions through ${fmtDate(PLAN_VALID_UNTIL,{day:"numeric",month:"short"})} and was last revised ${fmtDate(PLAN_REVISED,{day:"numeric",month:"short"})}. The Garmin sections below are current; this one needs a new plan from the coach.</div></div>`;
+    }
+    html += `
     <div class="card plan-intro">
-      <p><b>Race calendar just got real:</b> Berlin WoMan sprint (Wannsee, 6 Sep) and IRONMAN 5150 Erkner (Olympic distance, 12 Sep) are only 6 days apart, with Challenge Barcelona (middle distance, 25 Oct) as the season's next true A-race. You chose to <b>protect Erkner and race Wannsee controlled</b> — this plan reflects that. You've also decided to race <b>both</b> on the new Speedmax rather than ease it in gradually: since neither result matters much to you, they're a deliberately low-stakes place to learn the bike for real — swim exit into T1, standing starts, cornering, fueling in aero — before it's likely carrying you through Barcelona.</p>
-      <p><b>Weekly rhythm from here:</b> Tuesday and Friday mornings are swim at Prinzenbad (fixed, on the way to work), Friday afternoon is your run window (up to 60–90 min, trimmed when a race is close), and weekends carry the long rides and bricks. Monday, Wednesday and Thursday are the flexible slots — bike intervals, strength, easy running — and that's where the plan below moves things around when a fixed day doesn't fit a session.</p>
-      <p>Recovery week (13–19 Sep) is intentionally loose — racing twice in six days is real fatigue, and forcing structure back too early is how the Barcelona build starts from a hole instead of a base. The Barcelona build itself (outlined below) starts once that week is done; I'll write it day-by-day as we get closer. HR zones and pace targets throughout are pulled from your current Garmin data, so they update automatically next refresh.</p>
+      <p><b>Where we are:</b> the 2026 season is closed — Erkner (2:33, Speedmax debut) was the last race and Barcelona is off. The next A-race is <b>Audi Triathlon Ingolstadt, 6 Jun 2027</b>, goal sub-5:00. Registration opens <b>Thu 1 Oct, 08:00</b>.</p>
+      <p><b>This block (from 14 Sep):</b> bike first. Raise bike share and duration in the aero position on the Speedmax, get a <b>tested FTP</b>, and lift cadence from the habitual 56–66 rpm — the likely cause of the quad strain at Erkner. Bike share has already moved from ~9 % to ~58 % of non-race load; the gap now is long aero rides and a measured number to train from.</p>
+      <p><b>Open question:</b> bike HR on 19 and 23 Sep ran 15–25 bpm above what power predicts from Erkner (199 W @ 140 bpm), peaking at 189 bpm. Treat it as a wrist-sensor artefact until a chest strap says otherwise — but today's low HRV means the weekend is gated on how you wake up. HR targets use your Charité lab values (HRmax 177, IAS HR 149), not Garmin's zones.</p>
     </div>`;
 
     BLOCKS.forEach(block => {
@@ -1238,31 +1210,42 @@
       html += `</tbody></table></div>`;
     });
 
-    html += `<div class="block-label"><h3>Looking ahead — Challenge Barcelona build</h3><span class="block-dates">Mon 20 Sep – Sun 25 Oct</span><div class="rule"></div></div>
-    <p style="font-size:12.5px;color:var(--ink-2);margin:-2px 0 10px;max-width:78ch;">Outline only — I'll turn this into a week-by-week plan once the recovery week is behind us. Worth naming now: this is a <b style="color:var(--ink-2)">compressed prep</b> — about 5.5 weeks from Erkner to race day, of which only ~3–3.5 are real build once you subtract recovery and a 70.3 taper. The realistic goal is executing well on the fitness you already have from the Alghero block plus this cycling push, not chasing large new gains in three weeks.</p>
+    html += `<div class="block-label"><h3>Looking ahead — road to Ingolstadt</h3><span class="block-dates">Oct 2026 – 6 Jun 2027</span><div class="rule"></div></div>
+    <p style="font-size:12.5px;color:var(--ink-2);margin:-2px 0 10px;max-width:78ch;">Provisional outline — the detailed 2027 periodization is still to be written. Salou (9 May) stays conditional until you know whether the kids can travel; it currently clashes with the Baltic trip (6–18 May).</p>
     <div class="table-scroll card"><table class="phase-table"><thead><tr><th>Phase</th><th>Dates</th><th>Focus</th></tr></thead><tbody>
-      <tr><td class="strong">Reintroduction</td><td class="mono">20–28 Sep</td><td>Resume the normal weekly rhythm (Tue/Fri swim, weekend long) at reduced volume; bike stays on the Speedmax — by now it's a known quantity from two races, so this phase is about rebuilding volume, not familiarization.</td></tr>
-      <tr><td class="strong">Build</td><td class="mono">29 Sep – 12 Oct</td><td>Bike-specific threshold + Speedmax aero-endurance, one weekly brick, swim maintenance, run capped to protect the bike focus. Barcelona is raced on the Speedmax by default from here — revisit only if Wannsee or Erkner surfaced a real fit or aero-durability problem.</td></tr>
-      <tr><td class="strong">Peak / race-specific</td><td class="mono">13–19 Oct</td><td>Longest brick of the block, race-pace and fueling rehearsal on the race-day bike, then sharpen.</td></tr>
-      <tr><td class="strong">Taper</td><td class="mono">20–24 Oct</td><td>Volume down, intensity touches maintained, travel &amp; logistics for Barcelona.</td></tr>
-      <tr class="race-row"><td class="strong">RACE — Challenge Barcelona</td><td class="mono">Sun 25 Oct</td><td>Middle distance (70.3) — priority A.</td></tr>
+      <tr><td class="strong">Bike block</td><td class="mono">14 Sep – late Oct</td><td>Tested FTP, weekly long Speedmax ride, cadence work, strength restarted. Run and swim held at maintenance.</td></tr>
+      <tr><td class="strong">Winter base</td><td class="mono">Nov – Feb</td><td>Mostly indoor Speedmax on the Wahoo: threshold/sweet-spot and aero-position time, iterative fit dialing (setback). Strength 2×/week. Swim technique, ideally with the Thursday group.</td></tr>
+      <tr><td class="strong">Mallorca camp</td><td class="mono">5 – 8 Mar</td><td>Long-ride block with Dominik — first real outdoor volume of the year.</td></tr>
+      <tr><td class="strong">Build</td><td class="mono">Mar – Apr</td><td>Race-specific bike power, bricks, run durability. ~25 km run race around 18 Apr as a check.</td></tr>
+      <tr><td class="strong">Specific + taper</td><td class="mono">May – 5 Jun</td><td>Race simulations, fuelling rehearsal, heat considerations; taper around the Baltic trip.</td></tr>
+      <tr class="race-row"><td class="strong">RACE — Audi Triathlon Ingolstadt</td><td class="mono">Sun 6 Jun 2027</td><td>Middle distance (1.9 / 86 / 20.1) — priority A, goal sub-5:00.</td></tr>
     </tbody></table></div>`;
 
     planContent.innerHTML = html;
-    document.getElementById("plan-note").textContent = `Rebuilt ${genDate.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})} around racing the Speedmax at both Sept events and the Tue/Fri swim + Fri run weekly rhythm · next revision: Barcelona build detail`;
+    document.getElementById("plan-note").textContent = planStale
+      ? `Out of date — plan covered through ${fmtDate(PLAN_VALID_UNTIL,{day:"2-digit",month:"short"})} · last revised ${fmtDate(PLAN_REVISED,{day:"2-digit",month:"short",year:"numeric"})}`
+      : `Revised ${fmtDate(PLAN_REVISED,{day:"2-digit",month:"short",year:"numeric"})} · sessions through ${fmtDate(PLAN_VALID_UNTIL,{day:"2-digit",month:"short"})}`;
   })();
 
   // ================= RACE CALENDAR =================
-  const algheroActivity = activities.find(a => a.name && a.name.toLowerCase().includes("alghero") && a.type === "multi_sport");
+  // Coach-maintained list. Status is derived from the date (past = done), and the
+  // result is taken from the matching Garmin multi-sport activity when there is one.
+  function raceResult(r) {
+    const act = activities.find(a => a.date === r.date && a.type === "multi_sport");
+    if (act) return `Finished in ${fmtHMS(act.duration_s)}.` + (r.resultNote ? " " + r.resultNote : "");
+    return r.fallbackResult || "Done.";
+  }
   const races = [
-    {
-      priority: "A", name: "IRONMAN 70.3 Alghero", date: "2026-06-07", status: "done",
-      result: algheroActivity ? `Finished in ${fmtHMS(algheroActivity.duration_s)} — well inside the 5:45–5:50 target.` : "Finished ~5:19 — well inside the 5:45–5:50 target."
-    },
-    { priority: "C", name: "Berlin WoMan — Wannsee", sub: "Sprint distance", date: "2026-09-06", status: "upcoming", note: "Controlled effort — opener for Erkner, and first race on the Speedmax" },
-    { priority: "B", name: "IRONMAN 5150 Erkner", sub: "Olympic distance", date: "2026-09-12", status: "upcoming", note: "Protected race of the double-header — second Speedmax outing" },
-    { priority: "A", name: "Challenge Barcelona", sub: "Middle distance (70.3)", date: "2026-10-25", status: "upcoming", note: "Season's next goal race" }
-  ];
+    { priority: "A", name: "IRONMAN 70.3 Alghero", sub: "Middle distance", date: "2026-06-07", resultNote: "Target was 5:45–5:50.", fallbackResult: "Finished 5:19:38 — target was 5:45–5:50." },
+    { priority: "B", name: "IRONMAN 5150 Erkner", sub: "Olympic distance", date: "2026-09-12", resultNote: "Speedmax debut: bike 34.4 km/h @ 199 W.", fallbackResult: "Finished 2:33 — Speedmax debut." },
+    { priority: "C", name: "25 km run (likely S25 Berlin)", sub: "Run race — date provisional", date: "2027-04-18", note: "Run durability check ahead of Ingolstadt" },
+    { priority: "B", name: "Challenge Salou", sub: "Middle distance — conditional", date: "2027-05-09", note: "Only if the kids can travel; clashes with the Baltic trip (6–18 May). Decide end of 2026." },
+    { priority: "A", name: "Audi Triathlon Ingolstadt", sub: "Middle distance (1.9 / 86 / 20.1)", date: "2027-06-06", note: "Goal sub-5:00. Registration opens Thu 1 Oct 2026, 08:00." },
+    { priority: "B", name: "Köln Triathlon", sub: "Olympic distance", date: "2027-09-05", note: "Not yet registered" }
+  ].map(r => {
+    const done = daysUntil(r.date) < 0;
+    return Object.assign({}, r, { status: done ? "done" : "upcoming", result: done ? raceResult(r) : null });
+  });
   const raceGrid = document.getElementById("race-grid");
   raceGrid.innerHTML = races.map(r => {
     let statusHtml = "";
